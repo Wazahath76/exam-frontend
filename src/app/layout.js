@@ -1,14 +1,17 @@
 import "./globals.css";
 import Navbar from "./components/Navbar";
 
+export const metadata = {
+  title: "Exam Hub",
+  description: "Find best exams",
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="bg-gray-50 text-gray-900">
+      <body>
         <Navbar />
-        <main className="max-w-5xl mx-auto px-6 py-10">
-          {children}
-        </main>
+        {children}
       </body>
     </html>
   );

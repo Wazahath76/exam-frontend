@@ -4,19 +4,14 @@ import Link from "next/link";
 
 export default function Navbar() {
   return (
-    <div className="w-full bg-white/90 backdrop-blur-md shadow-sm px-8 py-4 flex justify-between items-center">
-      <Link href="/" className="text-xl font-bold text-indigo-600">
-        🎯 Exam Hub
-      </Link>
+    <nav className="bg-white border-b shadow-sm px-6 py-3 flex justify-between items-center">
+      <h1 className="font-bold text-lg text-indigo-600">Exam Hub</h1>
 
-      <div className="flex gap-6">
-        <Link href="/" className="text-gray-700 hover:text-indigo-600">
-          Home
-        </Link>
-        <Link href="/exams" className="text-gray-700 hover:text-indigo-600">
-          Explore
-        </Link>
+      <div className="space-x-4">
+        <Link href="/" className="hover:text-indigo-600">Home</Link>
+        <Link href="/exams" className="hover:text-indigo-600">Exams</Link>
+        <Link href="/saved" className="hover:text-indigo-600">Saved ⭐</Link>
       </div>
-    </div>
+    </nav>
   );
 }

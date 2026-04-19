@@ -3,8 +3,7 @@
 import { useEffect, useState, use } from "react";
 
 export default function ExamDetail({ params }) {
-  const { slug } = use(params); // ✅ FIX HERE
-
+  const { slug } = use(params);
   const [exam, setExam] = useState(null);
 
   useEffect(() => {
@@ -18,49 +17,66 @@ export default function ExamDetail({ params }) {
     return <p className="p-10 text-center">Loading...</p>;
   }
 
+  const getBadgeColor = (level) => {
+    if (level === "HARD") return "bg-red-100 text-red-600";
+    if (level === "MEDIUM") return "bg-yellow-100 text-yellow-700";
+    return "bg-green-100 text-green-600";
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-white to-purple-100 p-10 flex justify-center">
+    <div className="min-h-screen bg-gray-50 flex justify-center p-10">
 
-      <div className="max-w-2xl w-full bg-white p-6 rounded-2xl shadow-lg">
+      <div className="max-w-2xl w-full bg-white p-6 rounded-xl shadow">
 
-        <h1 className="text-3xl font-bold mb-2 text-gray-900">
-          {exam.name}
-        </h1>
+        <div className="flex justify-between items-center mb-3">
+          <h1 className="text-2xl font-bold">{exam.name}</h1>
+
+          <span className={`text-xs px-2 py-1 rounded ${getBadgeColor(exam.difficultyLevel)}`}>
+            {exam.difficultyLevel}
+          </span>
+        </div>
 
         <p className="text-indigo-600 mb-4">
           {exam.examType} • {exam.stream}
         </p>
 
-        <p className="mb-4 text-gray-800">
+        <p className="mb-4 text-gray-700">
           {exam.description}
         </p>
 
-        <div className="mb-4">
-          <h3 className="font-semibold">Eligibility</h3>
+        <div className="mb-3">
+          <strong>Eligibility:</strong>
           <p>{exam.eligibility}</p>
         </div>
 
-        <div className="mb-4">
-          <h3 className="font-semibold">Syllabus</h3>
+        <div className="mb-3">
+          <strong>Syllabus:</strong>
           <p>{exam.syllabus}</p>
         </div>
 
-        <div className="mb-4">
-          <h3 className="font-semibold">Difficulty</h3>
-          <p>{exam.difficultyLevel}</p>
-        </div>
+        {/* SAVE BUTTON */}
+        <button
+          onClick={() => {
+            fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/api/saved?slug=${exam.slug}&userId=demoUser`,
+              { method: "POST" }
+            )
+              .then(() => alert("Saved ⭐"))
+              .catch(() => alert("Error"));
+          }}
+          className="mt-4 text-yellow-600 font-medium hover:underline"
+        >
+          ⭐ Save this exam
+        </button>
 
-        <div className="mb-4">
-          <h3 className="font-semibold">Official URL</h3>
-<a
-  href={exam.officialUrl}
-  target="_blank"
-  rel="noopener noreferrer"
-  className="inline-block mt-1 text-indigo-600 font-medium hover:underline"
->
-  Visit Official Website →
-</a>
-        </div>
+        <a
+          href={exam.officialUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block mt-4 text-indigo-600 hover:underline"
+        >
+          Visit Official Website →
+        </a>
 
       </div>
     </div>

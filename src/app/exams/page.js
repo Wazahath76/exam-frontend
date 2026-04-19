@@ -4,155 +4,76 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 export default function ExamsPage() {
-
   const [exams, setExams] = useState([]);
-  const [filtered, setFiltered] = useState([]);
 
-  const [cls, setCls] = useState("");
-  const [stream, setStream] = useState("");
-  const [search, setSearch] = useState("");
-
-  // Fetch all exams once
-useEffect(() => {
-
-  fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/exams`)
-    .then((res) => res.json())
-    .then((data) => {
-      setExams(data);
-      setFiltered(data);
-    })
-    .catch((err) => console.error("ERROR:", err));
-}, []);
-
-  // Apply filters
   useEffect(() => {
-    let data = [...exams];
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/exams`)
+      .then((res) => res.json())
+      .then((data) => setExams(data))
+      .catch((err) => console.error(err));
+  }, []);
 
-    if (cls) {
-      data = data.filter(
-        (e) => e.minClass <= Number(cls) && e.maxClass >= Number(cls)
-      );
-    }
-
-    if (stream && (cls === "11" || cls === "12")) {
-      data = data.filter(
-        (e) => e.stream === stream || e.stream === "ALL"
-      );
-    }
-
-    if (search) {
-      data = data.filter((e) =>
-        e.name.toLowerCase().includes(search.toLowerCase())
-      );
-    }
-
-    setFiltered(data);
-  }, [cls, stream, search, exams]);
+  const getBadgeColor = (level) => {
+    if (level === "HARD") return "bg-red-100 text-red-600";
+    if (level === "MEDIUM") return "bg-yellow-100 text-yellow-700";
+    return "bg-green-100 text-green-600";
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gray-50 px-6 py-10">
 
-      <div className="max-w-5xl mx-auto px-6 py-10">
+      <h1 className="text-3xl font-bold mb-8 text-center">
+        📚 All Exams
+      </h1>
 
-        {/* HEADER */}
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-gray-900">
-            📚 Explore Exams
-          </h1>
-          <p className="text-gray-600">
-            Browse and filter exams easily
-          </p>
-        </div>
+      <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
 
-        {/* FILTER CARD */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-md mb-8">
+        {exams.map((exam) => (
+          <Link key={exam.id} href={`/exams/${exam.slug}`}>
+            <div className="bg-white p-5 rounded-xl border hover:shadow-lg transition cursor-pointer">
 
-          <div className="grid md:grid-cols-3 gap-4">
-
-            {/* Class */}
-            <select
-              className="border p-3 rounded-lg"
-              value={cls}
-              onChange={(e) => {
-                setCls(e.target.value);
-                setStream("");
-              }}
-            >
-              <option value="">Class</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-              <option value="10">10</option>
-              <option value="11">11</option>
-              <option value="12">12</option>
-            </select>
-
-            {/* Stream */}
-            <select
-              className="border p-3 rounded-lg disabled:bg-gray-100"
-              value={stream}
-              onChange={(e) => setStream(e.target.value)}
-              disabled={!(cls === "11" || cls === "12")}
-            >
-              <option value="">
-                {cls === "11" || cls === "12"
-                  ? "Stream"
-                  : "Only for 11 & 12"}
-              </option>
-
-              {(cls === "11" || cls === "12") && (
-                <>
-                  <option value="PCM">PCM</option>
-                  <option value="PCB">PCB</option>
-                  <option value="COMMERCE">Commerce</option>
-                </>
-              )}
-            </select>
-
-            {/* Search */}
-            <input
-              placeholder="Search exams..."
-              className="border p-3 rounded-lg"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-
-          </div>
-        </div>
-
-        {/* RESULTS */}
-        <div className="grid md:grid-cols-2 gap-6">
-
-          {filtered.length === 0 && (
-            <p className="text-gray-500 col-span-full text-center">
-              No exams found 😕
-            </p>
-          )}
-
-          {filtered.map((exam) => (
-            <Link key={exam.id} href={`/exams/${exam.slug}`}>
-              <div className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-lg hover:-translate-y-1 transition cursor-pointer">
-
-                <h2 className="font-semibold text-lg text-gray-900">
+              <div className="flex justify-between items-center mb-2">
+                <h2 className="font-semibold text-lg">
                   {exam.name}
                 </h2>
 
-                <p className="text-sm text-indigo-600 font-medium">
-                  {exam.examType} • {exam.stream}
-                </p>
-
-                <p className="text-gray-600 mt-2 text-sm">
-                  {exam.description || "No description"}
-                </p>
-
-                <span className="inline-block mt-3 text-indigo-600 font-medium">
-                  View Details →
+                <span className={`text-xs px-2 py-1 rounded ${getBadgeColor(exam.difficultyLevel)}`}>
+                  {exam.difficultyLevel}
                 </span>
-
               </div>
-            </Link>
-          ))}
 
-        </div>
+              <p className="text-sm text-indigo-600">
+                {exam.examType} • {exam.stream}
+              </p>
+
+              <p className="text-gray-600 mt-2 text-sm">
+                {exam.description}
+              </p>
+
+              {/* SAVE BUTTON */}
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+
+                  fetch(
+                    `${process.env.NEXT_PUBLIC_API_URL}/api/saved?slug=${exam.slug}&userId=demoUser`,
+                    { method: "POST" }
+                  )
+                    .then(() => alert("Saved ⭐"))
+                    .catch(() => alert("Error"));
+                }}
+                className="mt-3 text-yellow-600 text-sm font-medium hover:underline"
+              >
+                ⭐ Save
+              </button>
+
+              <p className="text-indigo-600 mt-2 text-sm font-medium">
+                View Details →
+              </p>
+
+            </div>
+          </Link>
+        ))}
 
       </div>
     </div>

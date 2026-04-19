@@ -10,15 +10,9 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
 
   const getRecommendations = async () => {
-    if (!cls) {
-      alert("Select class");
-      return;
-    }
-
-    if ((cls === "11" || cls === "12") && !stream) {
-      alert("Select stream");
-      return;
-    }
+    if (!cls) return alert("Select class");
+    if ((cls === "11" || cls === "12") && !stream)
+      return alert("Select stream");
 
     try {
       setLoading(true);
@@ -37,29 +31,34 @@ export default function Home() {
     }
   };
 
+  const getBadgeColor = (level) => {
+    if (level === "HARD") return "bg-red-100 text-red-600";
+    if (level === "MEDIUM") return "bg-yellow-100 text-yellow-700";
+    return "bg-green-100 text-green-600";
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
 
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="max-w-5xl mx-auto px-6 py-12">
 
         {/* HEADER */}
-        <div className="mb-10 text-center">
-          <h1 className="text-5xl font-bold text-gray-900 mb-2">
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-bold text-gray-900 mb-3">
             🎯 Exam Hub
           </h1>
           <p className="text-gray-600 text-lg">
-            Discover exams based on your profile
+            Find the best exams for your future 🚀
           </p>
         </div>
 
-        {/* FORM CARD */}
-        <div className="bg-white/80 backdrop-blur-md border border-gray-200 rounded-2xl p-6 shadow-md mb-10">
+        {/* FORM */}
+        <div className="bg-white shadow-lg rounded-2xl p-6 mb-10 border">
 
           <div className="grid md:grid-cols-2 gap-4">
 
-            {/* Class */}
             <select
-              className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none"
+              className="border p-3 rounded-lg"
               value={cls}
               onChange={(e) => {
                 setCls(e.target.value);
@@ -74,9 +73,8 @@ export default function Home() {
               <option value="12">12</option>
             </select>
 
-            {/* Stream */}
             <select
-              className="border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none disabled:bg-gray-100"
+              className="border p-3 rounded-lg disabled:bg-gray-100"
               value={stream}
               onChange={(e) => setStream(e.target.value)}
               disabled={!(cls === "11" || cls === "12")}
@@ -95,57 +93,84 @@ export default function Home() {
                 </>
               )}
             </select>
-
           </div>
 
-          {/* Button */}
           <button
             onClick={getRecommendations}
-            className="mt-5 w-full bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 transition"
+            className="mt-5 w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition"
           >
             {loading ? "Loading..." : "Get Recommendations 🚀"}
           </button>
 
-          {/* Navigate */}
           <Link
             href="/exams"
-            className="block mt-4 text-center text-indigo-600 font-medium hover:underline"
+            className="block text-center mt-4 text-indigo-600 hover:underline"
           >
             Browse all exams →
           </Link>
         </div>
 
         {/* RESULTS */}
-        <div className="space-y-5">
+        <div className="grid md:grid-cols-2 gap-6">
+
           {exams.length === 0 && !loading && (
-            <p className="text-center text-gray-500">
-              No results yet. Select options above 👆
+            <p className="text-gray-500 col-span-full text-center">
+              No results yet 👆
             </p>
           )}
 
-          {exams.map((exam) => (
-            <Link key={exam.id} href={`/exams/${exam.slug}`}>
-              <div className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-lg hover:-translate-y-1 transition cursor-pointer">
+{exams.map((exam, index) => (
+  <Link key={exam.id} href={`/exams/${exam.slug}`}>
+    <div className="bg-white p-5 rounded-xl border hover:shadow-xl transition cursor-pointer">
 
-                <h2 className="font-semibold text-lg text-gray-900">
-                  {exam.name}
-                </h2>
+      <div className="flex justify-between items-center mb-2">
+        <h2 className="font-semibold text-lg">
+          {exam.name}
+        </h2>
 
-                <p className="text-sm text-indigo-600 font-medium">
-                  {exam.examType} • {exam.stream}
-                </p>
+        <span className={`text-xs px-2 py-1 rounded ${getBadgeColor(exam.difficultyLevel)}`}>
+          {exam.difficultyLevel}
+        </span>
+      </div>
 
-                <p className="text-gray-600 mt-2 text-sm">
-                  {exam.description || "No description available"}
-                </p>
+      <p className="text-sm text-indigo-600">
+        {exam.examType} • {exam.stream}
+      </p>
 
-                <span className="inline-block mt-3 text-indigo-600 font-medium">
-                  View Details →
-                </span>
+      <p className="text-gray-600 mt-2 text-sm">
+        {exam.description}
+      </p>
 
-              </div>
-            </Link>
-          ))}
+      {/* ⭐ SAVE BUTTON */}
+      <button
+        onClick={(e) => {
+          e.preventDefault(); // stop link navigation
+
+          fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/saved?slug=${exam.slug}&userId=demoUser`,
+            { method: "POST" }
+          )
+            .then(() => alert("Saved ⭐"))
+            .catch(() => alert("Error saving"));
+        }}
+        className="mt-3 text-yellow-600 text-sm font-medium hover:underline"
+      >
+        ⭐ Save
+      </button>
+
+      {index === 0 && (
+        <span className="text-xs bg-indigo-100 text-indigo-600 px-2 py-1 rounded mt-2 inline-block ml-2">
+          Best Match
+        </span>
+      )}
+
+      <p className="text-indigo-600 mt-2 text-sm font-medium">
+        View Details →
+      </p>
+
+    </div>
+  </Link>
+))}
         </div>
 
       </div>
