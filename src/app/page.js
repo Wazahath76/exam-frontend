@@ -63,7 +63,7 @@ export default function Home() {
               value={cls}
               onChange={(e) => {
                 setCls(e.target.value);
-                setStream(""); // reset stream
+                setStream("");
               }}
             >
               <option value="">Select Class</option>
@@ -124,22 +124,27 @@ export default function Home() {
           )}
 
           {exams.map((exam) => (
-            <div
-              key={exam.id}
-              className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-lg hover:-translate-y-1 transition"
-            >
-              <h2 className="font-semibold text-lg text-gray-900">
-                {exam.name}
-              </h2>
+            <Link key={exam.id} href={`/exams/${exam.slug}`}>
+              <div className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-lg hover:-translate-y-1 transition cursor-pointer">
 
-              <p className="text-sm text-indigo-600 font-medium">
-                {exam.examType} • {exam.stream}
-              </p>
+                <h2 className="font-semibold text-lg text-gray-900">
+                  {exam.name}
+                </h2>
 
-              <p className="text-gray-600 mt-2 text-sm">
-                {exam.description || "No description available"}
-              </p>
-            </div>
+                <p className="text-sm text-indigo-600 font-medium">
+                  {exam.examType} • {exam.stream}
+                </p>
+
+                <p className="text-gray-600 mt-2 text-sm">
+                  {exam.description || "No description available"}
+                </p>
+
+                <span className="inline-block mt-3 text-indigo-600 font-medium">
+                  View Details →
+                </span>
+
+              </div>
+            </Link>
           ))}
         </div>
 
