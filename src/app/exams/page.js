@@ -16,6 +16,8 @@ export default function ExamsPage() {
   // Fetch all exams once
 useEffect(() => {
   console.log("FETCH STARTED");
+    
+  console.log("ENV:", process.env.NEXT_PUBLIC_API_URL);
 
   fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/exams`)
     .then((res) => res.json())
