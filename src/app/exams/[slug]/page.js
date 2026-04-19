@@ -8,7 +8,7 @@ export default function ExamDetail({ params }) {
   const [exam, setExam] = useState(null);
 
   useEffect(() => {
-    fetch(`https://examtracker-production.up.railway.app/api/exams/slug/${slug}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/exams/slug/${slug}`)
       .then((res) => res.json())
       .then((data) => setExam(data))
       .catch((err) => console.error(err));

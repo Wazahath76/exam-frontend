@@ -12,15 +12,15 @@ export default function ExamsPage() {
   const [search, setSearch] = useState("");
 
   // Fetch all exams once
-  useEffect(() => {
-    fetch("https://examtracker-production.up.railway.app/api/exams")
-      .then((res) => res.json())
-      .then((data) => {
-        setExams(data);
-        setFiltered(data);
-      })
-      .catch((err) => console.error(err));
-  }, []);
+useEffect(() => {
+  fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/exams`)
+    .then((res) => res.json())
+    .then((data) => {
+      setExams(data);
+      setFiltered(data);
+    })
+    .catch((err) => console.error("API error:", err));
+}, []);
 
   // Apply filters
   useEffect(() => {

@@ -24,7 +24,7 @@ export default function Home() {
       setLoading(true);
 
       const res = await fetch(
-        `https://examtracker-production.up.railway.app/api/exams/recommend?cls=${cls}&stream=${stream || "ALL"}`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/exams/recommend?cls=${cls}&stream=${stream || "ALL"}`
       );
 
       const data = await res.json();
